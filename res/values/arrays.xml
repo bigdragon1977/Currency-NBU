@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string-array name="currency">
+        <item>U.S. Dollar</item>
+        <item>Euro</item>
+        <item>Russian Ruble</item>
+        <item>British Pound Sterling</item>
+        <!--<item>Jupiter</item>-->
+        <!--<item>Saturn</item>-->
+        <!--<item>Uranus</item>-->
+        <!--<item>Neptune</item>-->
+    </string-array>
+</resources>
