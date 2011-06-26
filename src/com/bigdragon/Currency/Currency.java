@@ -1,10 +1,21 @@
 package com.bigdragon.Currency;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.os.Bundle;
+
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+import android.view.View.OnClickListener;
+
+import android.content.Context;
+import android.content.DialogInterface;
 
 import android.widget.TextView;
 import android.widget.EditText;
@@ -17,6 +28,7 @@ public class Currency extends Activity
 {
 	private EditText text;
     private TextView labelview;
+    static final int DIALOG_ABOUT = 0;
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -66,5 +78,61 @@ public class Currency extends Activity
     }
     private float convertValtoVal(float grn){
     	return(grn * 8);
+    }
+    /*Create menu Item*/
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.currency_menu, menu);
+        return true;
+
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+            switch (item.getItemId()) {
+                 case R.id.m_exit:
+                    quit();
+                case R.id.m_about:
+                    ShowDialog();
+                    break;
+                default:
+                break;
+                 }
+                 return true;
+                 //return false;
+                 }
+
+    private void ShowDialog(){
+
+        AlertDialog dialog = new AlertDialog.Builder(this).create();
+        dialog.setMessage("Your final score: ");
+        dialog.setButton(DialogInterface.BUTTON_POSITIVE, "Try this level again",
+        new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                //mScore = 0;
+                //start_level();
+            }
+        });
+        dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Advance to next level",
+        new DialogInterface.OnClickListener() {
+        public void onClick(DialogInterface dialog, int which) {
+            //mLevel++;
+            //start_level();
+        }
+        });
+        dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "Back to the main menu",
+        new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                //mLevel = 0;
+                finish();
+            }
+        });
+        dialog.show();
+
+    }
+
+    private void quit(){
+    this.finish();
+    super.onDestroy();
     }
 }

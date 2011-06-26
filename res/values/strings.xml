@@ -5,5 +5,8 @@
 	<string name="cu_to">To</string>
 	<string name="cu_convert">Convert</string>
 	<string name="currency_prompt">List of currencies</string>
+    <string name="update_currency">Update Currecy</string>
+    <string name="exit">Exit</string>
+    <string name="about">About</string>
     <!--<string name="title_input">GRN</string>-->
 </resources>
