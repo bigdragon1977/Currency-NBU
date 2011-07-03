@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.os.Bundle;
 
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -23,6 +24,9 @@ import android.widget.RadioButton;
 import android.widget.Toast;
 import android.widget.Spinner;
 import android.widget.ArrayAdapter;
+
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 
 public class Currency extends Activity
 {
@@ -43,6 +47,16 @@ public class Currency extends Activity
                 this, R.array.currency, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         s.setAdapter(adapter);
+        //////////////////////////////////////////////////
+        DbOpenHelper dbOpenHelper = new DbOpenHelper(Currency.this);
+        SQLiteDatabase db = dbOpenHelper.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+//                cv.put(DbOpenHelper.LOGIN,loginEditText.getText().toString());
+//                cv.put(DbOpenHelper.PASSW,passEditText.getText().toString());
+//                db.insert(DbOpenHelper.TABLE_NAME,null,cv);
+//      db.close();
+
+        /////////////////////////////////////////////////
     }
     public void cu_Clics(View view){
     	switch (view.getId()){
