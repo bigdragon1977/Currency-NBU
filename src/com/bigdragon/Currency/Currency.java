@@ -2,9 +2,13 @@ package com.bigdragon.Currency;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 
 import android.view.Gravity;
 import android.view.Menu;
@@ -32,7 +36,12 @@ public class Currency extends Activity
 {
 	private EditText text;
     private TextView labelview;
-    static final int DIALOG_ABOUT = 0;
+    SearchCurrency mProgressThread;
+    ProgressDialog mProgressDialog;
+
+    private final int DIALOG_EXIT = 0;
+    private final int DIALOG_ABOUT = 1;
+    static final int DIALOG_PROGRESS = 2;
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -57,6 +66,9 @@ public class Currency extends Activity
 //      db.close();
 
         /////////////////////////////////////////////////
+                    showDialog(DIALOG_PROGRESS);
+        //ProgressDialog dialog = ProgressDialog.show(Currency.this, "","Loading. Please wait...", true);
+
     }
     public void cu_Clics(View view){
     	switch (view.getId()){
@@ -107,7 +119,8 @@ public class Currency extends Activity
                  case R.id.m_exit:
                     quit();
                 case R.id.m_about:
-                    ShowDialog();
+                    showDialog(DIALOG_ABOUT);
+                    //ShowDialog();
                     break;
                 default:
                 break;
@@ -116,34 +129,88 @@ public class Currency extends Activity
                  //return false;
                  }
 
-    private void ShowDialog(){
+    //private void ShowDialog(){
 
-        AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setMessage("Your final score: ");
-        dialog.setButton(DialogInterface.BUTTON_POSITIVE, "Try this level again",
-        new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                //mScore = 0;
-                //start_level();
-            }
-        });
-        dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Advance to next level",
-        new DialogInterface.OnClickListener() {
-        public void onClick(DialogInterface dialog, int which) {
-            //mLevel++;
-            //start_level();
+        //AlertDialog dialog = new AlertDialog.Builder(this).create();
+        //dialog.setMessage("Your final score: ");
+        //dialog.setButton(DialogInterface.BUTTON_POSITIVE, "Try this level again",
+        //new DialogInterface.OnClickListener() {
+            //public void onClick(DialogInterface dialog, int which) {
+                ////mScore = 0;
+                ////start_level();
+            //}
+        //});
+        //dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Advance to next level",
+        //new DialogInterface.OnClickListener() {
+        //public void onClick(DialogInterface dialog, int which) {
+            ////mLevel++;
+            ////start_level();
+        //}
+        //});
+        //dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "Back to the main menu",
+        //new DialogInterface.OnClickListener() {
+            //public void onClick(DialogInterface dialog, int which) {
+                ////mLevel = 0;
+                //finish();
+            //}
+        //});
+        //dialog.show();
+
+    //}
+/////////////////////////////////////////////////////////////////////////
+@Override
+    protected Dialog onCreateDialog(int id) {
+        switch (id) {
+        case DIALOG_EXIT:
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Are you sure you want to exit?");
+            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    Currency.this.finish();
+                }
+            });
+            builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.cancel();
+                    }
+            });
+            builder.setCancelable(false);
+            return builder.create();
+        case DIALOG_ABOUT:
+            AlertDialog.Builder builder_about = new AlertDialog.Builder(this);
+            builder_about.setTitle("About");
+            builder_about.setMessage("About dialog");
+                builder_about.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                        }
+                });
+            builder_about.setCancelable(false);
+            return builder_about.create();
+        case DIALOG_PROGRESS:
+            mProgressDialog = new ProgressDialog(Currency.this);
+            //mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            mProgressDialog.setMessage("Loading...");
+            mProgressThread = new SearchCurrency(handler);
+            mProgressThread.start();
+            return mProgressDialog;
+        default:
+        return null;
         }
-        });
-        dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "Back to the main menu",
-        new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                //mLevel = 0;
-                finish();
-            }
-        });
-        dialog.show();
-
     }
+    final Handler handler = new Handler() {
+        public void handleMessage(Message msg) {
+            int total = msg.getData().getInt("total");
+            mProgressDialog.setProgress(total);
+            if (total >= 100){
+                dismissDialog(DIALOG_PROGRESS);
+                mProgressThread.setState(SearchCurrency.STATE_DONE);
+                Toast.makeText(getApplicationContext(), "Task is finished", Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
+/////////////////////////////////////////////////////////////////////////
 
     private void quit(){
     this.finish();
