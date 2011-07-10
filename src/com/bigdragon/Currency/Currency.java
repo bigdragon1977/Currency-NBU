@@ -31,6 +31,7 @@ import android.widget.ArrayAdapter;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.Cursor;
 
 public class Currency extends Activity
 {
@@ -42,6 +43,7 @@ public class Currency extends Activity
     private final int DIALOG_EXIT = 0;
     private final int DIALOG_ABOUT = 1;
     static final int DIALOG_PROGRESS = 2;
+    static final int DIALOG_NOT_RATE = 3;
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -63,10 +65,16 @@ public class Currency extends Activity
 //                cv.put(DbOpenHelper.LOGIN,loginEditText.getText().toString());
 //                cv.put(DbOpenHelper.PASSW,passEditText.getText().toString());
 //                db.insert(DbOpenHelper.TABLE_NAME,null,cv);
-//      db.close();
+        //db.close();
 
         /////////////////////////////////////////////////
-                    showDialog(DIALOG_PROGRESS);
+        Cursor db_cursor = db.query("update_rate",null,null,null,null,null,null);
+
+          if(db_cursor.getCount() == 0){
+          showDialog(DIALOG_NOT_RATE);
+          }
+          db_cursor.close();
+        //
         //ProgressDialog dialog = ProgressDialog.show(Currency.this, "","Loading. Please wait...", true);
 
     }
@@ -176,6 +184,18 @@ public class Currency extends Activity
             });
             builder.setCancelable(false);
             return builder.create();
+        case DIALOG_NOT_RATE:
+            AlertDialog.Builder builder_not_rate = new AlertDialog.Builder(this);
+            builder_not_rate.setTitle("Message");
+            builder_not_rate.setMessage("You want to see the course from the site of the NBU");
+                builder_not_rate.setNegativeButton("Ok",new DialogInterface.OnClickListener(){
+                    public void onClick(DialogInterface dialog, int id){
+                    dialog.cancel();
+                    showDialog(DIALOG_PROGRESS);
+                }
+        });
+                builder_not_rate.setCancelable(false);
+                return builder_not_rate.create();
         case DIALOG_ABOUT:
             AlertDialog.Builder builder_about = new AlertDialog.Builder(this);
             builder_about.setTitle("About");
