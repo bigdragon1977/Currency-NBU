@@ -33,13 +33,19 @@ import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.Cursor;
 
+import android.util.Log;
+import java.util.HashMap;
+import java.util.Locale;
+
 public class Currency extends Activity
 {
 	private EditText text;
     private TextView labelview;
     SearchCurrency mProgressThread;
     ProgressDialog mProgressDialog;
+    //public HashMap<String,Float> _currency = new HashMap<String,Float>();
 
+    HashMap<String,Float> local_currency;
     private final int DIALOG_EXIT = 0;
     private final int DIALOG_ABOUT = 1;
     static final int DIALOG_PROGRESS = 2;
@@ -74,6 +80,7 @@ public class Currency extends Activity
           showDialog(DIALOG_NOT_RATE);
           }
           db_cursor.close();
+
         //
         //ProgressDialog dialog = ProgressDialog.show(Currency.this, "","Loading. Please wait...", true);
 
@@ -227,6 +234,8 @@ public class Currency extends Activity
                 dismissDialog(DIALOG_PROGRESS);
                 mProgressThread.setState(SearchCurrency.STATE_DONE);
                 Toast.makeText(getApplicationContext(), "Task is finished", Toast.LENGTH_SHORT).show();
+                local_currency = SearchCurrency.currency;
+                //Log.d("DEBUG","TEST => "+ local_currency.get("USD"));
             }
         }
     };
