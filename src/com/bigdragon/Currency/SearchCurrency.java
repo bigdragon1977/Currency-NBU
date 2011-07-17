@@ -56,7 +56,7 @@ public class SearchCurrency extends Thread {
             if(td.size() == 5){
                 for (Element src : td){
                     if(new String(src.text()).equals("USD") || key_dolor == 1){
-                        Log.d("DEBUG","Start USD");
+                        //Log.d("DEBUG","Start USD");
                         key_dolor = 1;
                         k++;
                             if(k == 1){
@@ -69,10 +69,9 @@ public class SearchCurrency extends Thread {
                                 rate = Rounding(return_round);
                                 currency.put(name_currency,rate);
                                 k = 0;
+                                key_dolor = 0;
                             }
-                    }
-
-                    if(new String(src.text()).equals("RUB") || key_rub == 1){
+                    }else if(new String(src.text()).equals("RUB") || key_rub == 1){
                         key_rub = 1;
                         k++;
                             if(k == 1){
@@ -85,9 +84,9 @@ public class SearchCurrency extends Thread {
                                 rate = Rounding(return_round);
                                 currency.put(name_currency,rate);
                                 k = 0;
+                                key_rub = 0; 
                             }
-                    }
-                    if(new String(src.text()).equals("EUR") || key_euro == 1){
+                    }else if(new String(src.text()).equals("EUR") || key_euro == 1){
                         key_euro = 1;
                         k++;
                             if(k == 1){
@@ -100,6 +99,7 @@ public class SearchCurrency extends Thread {
                                 rate = Rounding(return_round);
                                 currency.put(name_currency,rate);
                                 k = 0;
+                                key_euro = 0;
                             }
                     }
                 }

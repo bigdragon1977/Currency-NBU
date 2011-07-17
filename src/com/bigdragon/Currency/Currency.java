@@ -36,7 +36,9 @@ import android.database.Cursor;
 import android.util.Log;
 import java.util.HashMap;
 import java.util.Locale;
-
+import java.util.Map;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 public class Currency extends Activity
 {
 	private EditText text;
@@ -235,6 +237,7 @@ public class Currency extends Activity
                 mProgressThread.setState(SearchCurrency.STATE_DONE);
                 Toast.makeText(getApplicationContext(), "Task is finished", Toast.LENGTH_SHORT).show();
                 local_currency = SearchCurrency.currency;
+                Insert_rate_to_database("new");
                 //Log.d("DEBUG","TEST => "+ local_currency.get("USD"));
             }
         }
@@ -244,5 +247,41 @@ public class Currency extends Activity
     private void quit(){
     this.finish();
     super.onDestroy();
+    }
+    private void Insert_rate_to_database(String state){
+        long id_insert_currency = 0;
+        long id_return_rate;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); 
+        Date date = new Date();
+        String insert_date = String.valueOf(dateFormat.format(date));
+        DbOpenHelper dbOpenHelper = new DbOpenHelper(Currency.this);
+        SQLiteDatabase db = dbOpenHelper.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+               //cv.put(DbOpenHelper.FIELD,loginEditText.getText().toString());
+               //cv.put(DbOpenHelper.PASSW,passEditText.getText().toString());
+               //db.insert(DbOpenHelper.TABLE_NAME,null,cv);
+        for(Map.Entry<String,Float> all : local_currency.entrySet()){
+            String key = all.getKey();
+            Float value = all.getValue();
+            String insert_value = String.valueOf(value);
+            if(state.equals("new")){
+            cv.put(DbOpenHelper.FIELD_CURRENCY_NAME,key);
+            id_insert_currency = db.insert(DbOpenHelper.TABLE_NAME_CURRENCY,null,cv);
+            cv.clear();
+            }else if(state.equals("update")){
+                Cursor db_cursor_currency = db.query("currency_name",new String[] {"id_currency"},"currency=?",new String[] {key},null,null,null);
+                id_insert_currency = db_cursor_currency.getLong(1);
+            }
+            cv.put(DbOpenHelper.FIELD_RATE,insert_value);
+            cv.put(DbOpenHelper.FIELD_DATA_UPDATE, insert_date);
+            id_return_rate = db.insert(DbOpenHelper.TABLE_NAME_UPDATE,null,cv);
+            cv.clear();
+            cv.put("id_currency",id_insert_currency);
+            cv.put("id_update",id_return_rate);
+            db.insert("global_currency",null,cv);
+            cv.clear();
+            //Log.d("DEBUG","KEY " + key + "  VALUE " + value);
+        }
+        db.close();
     }
 }
