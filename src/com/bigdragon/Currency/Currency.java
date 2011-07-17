@@ -28,6 +28,8 @@ import android.widget.RadioButton;
 import android.widget.Toast;
 import android.widget.Spinner;
 import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
@@ -45,6 +47,8 @@ public class Currency extends Activity
     private TextView labelview;
     SearchCurrency mProgressThread;
     ProgressDialog mProgressDialog;
+    Spinner s ;
+    public String select_currency;
     //public HashMap<String,Float> _currency = new HashMap<String,Float>();
 
     HashMap<String,Float> local_currency;
@@ -61,7 +65,7 @@ public class Currency extends Activity
         labelview = (TextView) findViewById(R.id.label);
         labelview.setText("Currency GRN\n");
         text = (EditText) findViewById(R.id.editText1);
-        Spinner s = (Spinner) findViewById(R.id.spinner);
+        s = (Spinner) findViewById(R.id.spinner);
         ArrayAdapter adapter = ArrayAdapter.createFromResource(
                 this, R.array.currency, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -86,6 +90,7 @@ public class Currency extends Activity
         //
         //ProgressDialog dialog = ProgressDialog.show(Currency.this, "","Loading. Please wait...", true);
 
+            s.setOnItemSelectedListener(new CurrencyOnItemSelectedListener());
     }
     public void cu_Clics(View view){
     	switch (view.getId()){
@@ -96,6 +101,8 @@ public class Currency extends Activity
     		Toast.makeText(this,"Please enter the number ",Toast.LENGTH_LONG).show();
     		return;
     		}
+
+
     		float inputValue = Float.parseFloat(text.getText().toString());
     		if (fromButton.isChecked()){
     			text.setText(String.valueOf(convertValtoGrn(inputValue)));
@@ -284,4 +291,20 @@ public class Currency extends Activity
         }
         db.close();
     }
+
+public class CurrencyOnItemSelectedListener implements OnItemSelectedListener {
+
+        public void onItemSelected(AdapterView<?> parent,
+                View view, int pos, long id) {
+                //Toast.makeText(parent.getContext(), "The planet is " +
+                //parent.getItemAtPosition(pos).toString(), Toast.LENGTH_LONG).show();
+                select_currency = parent.getItemAtPosition(pos).toString();
+                Log.d("DEBUG","Select currency " + select_currency);
+                }
+
+        public void onNothingSelected(AdapterView parent) {
+            // Do nothing.
+        }
+}
+
 }
