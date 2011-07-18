@@ -252,8 +252,8 @@ public class Currency extends Activity
 /////////////////////////////////////////////////////////////////////////
 
     private void quit(){
-    this.finish();
-    super.onDestroy();
+        this.finish();
+        super.onDestroy();
     }
     private void Insert_rate_to_database(String state){
         long id_insert_currency = 0;
@@ -291,6 +291,16 @@ public class Currency extends Activity
         }
         db.close();
     }
+   public float Select_rate(String select_currency){
+        int id_currency;
+        int id_rate;
+        DbOpenHelper dbOpenHelper = new DbOpenHelper(Currency.this);
+        SQLiteDatabase db = dbOpenHelper.getWritableDatabase();
+        Cursor db_cursor_select = db.query("currency_name",new String[] {"id_currency"},"currency=?",new String[] {key},null,null,null);
+        id_currency = db_curesor_select.getInt(1);
+        db_cursor_select = db.query("global_currency",new String[] {"id_update"},"currency=?",new String[] {key},null,null,null);
+
+        }
 
 public class CurrencyOnItemSelectedListener implements OnItemSelectedListener {
 
