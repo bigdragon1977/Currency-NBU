@@ -124,10 +124,12 @@ public class Currency extends Activity
                 labelview.setText("Currency US\n");
     }
     private float convertValtoGrn(float valut){
-    	return (valut / 8);
+        //Select_rate(select_currency);
+    	return (valut / Select_rate(select_currency));
     }
     private float convertValtoVal(float grn){
-    	return(grn * 8);
+        //float rate = Select_rate(select_currency);
+    	return(grn * Select_rate(select_currency));
     }
     /*Create menu Item*/
     @Override
@@ -291,15 +293,26 @@ public class Currency extends Activity
         }
         db.close();
     }
-   public float Select_rate(String select_currency){
-        int id_currency;
-        int id_rate;
+   public float Select_rate(String currency){
+        String return_rate = "";
         DbOpenHelper dbOpenHelper = new DbOpenHelper(Currency.this);
         SQLiteDatabase db = dbOpenHelper.getWritableDatabase();
-        Cursor db_cursor_select = db.query("currency_name",new String[] {"id_currency"},"currency=?",new String[] {key},null,null,null);
-        id_currency = db_curesor_select.getInt(1);
-        db_cursor_select = db.query("global_currency",new String[] {"id_update"},"currency=?",new String[] {key},null,null,null);
-
+        Log.d("DEBUG SELECT", "SELECT INPUT " + currency);
+        //Cursor db_cursor_select = db.query("currency_name",new String[] {"id_currency"},"currency=?",new String[] {key},null,null,null);
+        //id_currency = db_curesor_select.getInt(1);
+        //select rate from update_rate where id_update in (select id_update from global_currency where id_currency in ( select id_currency from currency_name where currency="USD"));
+        //db_cursor_select = db.query("global_currency",new String[] {"id_update"},"currency=?",new String[] {key},null,null,null);
+        String sql = "SELECT rate FROM update_rate WHERE id_update = (SELECT id_update FROM global_currency WHERE id_currency = ( SELECT id_currency FROM currency_name WHERE currency='USD'))";
+        Cursor db_cursor = db.rawQuery(sql,null);
+        db_cursor.moveToFirst();
+        while(!db_cursor.isAfterLast()){
+            //Log.d("DB DEBUG","Return query "+ db_cursor.getString(0));
+                    return_rate = db_cursor.getString(0);
+                    db_cursor.moveToNext();
+        }
+         //return Float.valueOf(db_cursor.getString(1));
+        db_cursor.close();
+         return Float.valueOf(return_rate);
         }
 
 public class CurrencyOnItemSelectedListener implements OnItemSelectedListener {
@@ -309,7 +322,7 @@ public class CurrencyOnItemSelectedListener implements OnItemSelectedListener {
                 //Toast.makeText(parent.getContext(), "The planet is " +
                 //parent.getItemAtPosition(pos).toString(), Toast.LENGTH_LONG).show();
                 select_currency = parent.getItemAtPosition(pos).toString();
-                Log.d("DEBUG","Select currency " + select_currency);
+                //Log.d("DEBUG","Select currency " + select_currency);
                 }
 
         public void onNothingSelected(AdapterView parent) {

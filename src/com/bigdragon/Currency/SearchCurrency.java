@@ -38,7 +38,7 @@ public class SearchCurrency extends Thread {
             int key_euro = 0;
             int key_rub = 0;
             int key_dolor = 0;
-            int k = 0;
+            int x = 0;
    
     SearchCurrency(Handler h) {
         mHandler = h;
@@ -58,47 +58,47 @@ public class SearchCurrency extends Thread {
                     if(new String(src.text()).equals("USD") || key_dolor == 1){
                         //Log.d("DEBUG","Start USD");
                         key_dolor = 1;
-                        k++;
-                            if(k == 1){
+                        x++;
+                            if(x == 1){
                                 name_currency = src.text();
-                            }else if(k == 2){
+                            }else if(x == 2){
                                 count = Integer.parseInt(src.text());
-                            }else if(k == 4){
+                            }else if(x == 4){
                                 rate = Float.valueOf(src.text()) / count;
                                 String return_round = String.valueOf(rate);
                                 rate = Rounding(return_round);
                                 currency.put(name_currency,rate);
-                                k = 0;
+                                x = 0;
                                 key_dolor = 0;
                             }
                     }else if(new String(src.text()).equals("RUB") || key_rub == 1){
                         key_rub = 1;
-                        k++;
-                            if(k == 1){
+                        x++;
+                            if(x == 1){
                                 name_currency = src.text();
-                            }else if(k == 2){
+                            }else if(x == 2){
                                 count = Integer.parseInt(src.text());
-                            }else if(k == 4){
+                            }else if(x == 4){
                                 rate = Float.valueOf(src.text()) / count;
                                 String return_round = String.valueOf(rate);
                                 rate = Rounding(return_round);
                                 currency.put(name_currency,rate);
-                                k = 0;
+                                x = 0;
                                 key_rub = 0; 
                             }
                     }else if(new String(src.text()).equals("EUR") || key_euro == 1){
                         key_euro = 1;
-                        k++;
-                            if(k == 1){
+                        x++;
+                            if(x == 1){
                                 name_currency = src.text();
-                            }else if(k == 2){
+                            }else if(x == 2){
                                 count = Integer.parseInt(src.text());
-                            }else if(k == 4){
+                            }else if(x == 4){
                                 rate = Float.valueOf(src.text()) / count;
                                 String return_round = String.valueOf(rate);
                                 rate = Rounding(return_round);
                                 currency.put(name_currency,rate);
-                                k = 0;
+                                x = 0;
                                 key_euro = 0;
                             }
                     }
