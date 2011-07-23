@@ -101,22 +101,21 @@ public class Currency extends Activity
     		Toast.makeText(this,"Please enter the number ",Toast.LENGTH_LONG).show();
     		return;
     		}
-
-
     		float inputValue = Float.parseFloat(text.getText().toString());
     		if (fromButton.isChecked()){
     			text.setText(String.valueOf(convertValtoGrn(inputValue)));
                 chengeLabel();
-    		}else{
-    			text.setText(String.valueOf(convertValtoVal(inputValue)));
-                chengeLabel();
     		}
+            //else{
+                //text.setText(String.valueOf(convertValtoVal(inputValue)));
+                //chengeLabel();
+            //}
     		if(toButton.isChecked()){
     			text.setText(String.valueOf(convertValtoVal(inputValue)));
-    		}else{
-    			text.setText(String.valueOf(convertValtoGrn(inputValue)));
-    			}
-
+    		}
+            //else{
+                //text.setText(String.valueOf(convertValtoGrn(inputValue)));
+                //}
     		break;
 		}
     }
