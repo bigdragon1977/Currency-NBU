@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Currency</string>
-	<string name="cu_from">From</string>
-	<string name="cu_to">To</string>
+    <string name="title_current">Current currency </string>
+	<string name="cu_from">Convert to select currency</string>
+	<string name="cu_to">Convert to GRN</string>
 	<string name="cu_convert">Convert</string>
 	<string name="currency_prompt">List of currencies</string>
     <string name="config">Preferences</string>

@@ -1,4 +1,4 @@
-package com.bigdragon.Currency;
+package com.bigdragon.currency;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,9 +23,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 public class SearchCurrency extends Thread {
-	
     final static String url = "http://www.bank.gov.ua/Fin_ryn/OF_KURS/Currency/FindByDate.aspx";
-
     public static HashMap<String,Float> currency = new HashMap<String,Float>();
     Handler mHandler;
     final static int STATE_DONE = 0;
@@ -35,20 +33,20 @@ public class SearchCurrency extends Thread {
     String name_currency;
     Float rate;
     int count;
-            int key_euro = 0;
-            int key_rub = 0;
-            int key_dolor = 0;
-            int x = 0;
+    int key_euro = 0;
+    int key_rub = 0;
+    int key_dolor = 0;
+    int key_gbp = 0;
+    int x = 0;
    
     SearchCurrency(Handler h) {
         mHandler = h;
     }
-   
     public void run() {
         mState = STATE_RUNNING;   
         mTotal = 0;
         while (mState == STATE_RUNNING) {
-            try {
+        try {
         Document doc = Jsoup.connect(url).get();
         Elements tr = doc.select("form#tableForm table tbody tr");
         for(int i = 1; i < tr.size(); i++){
@@ -56,7 +54,6 @@ public class SearchCurrency extends Thread {
             if(td.size() == 5){
                 for (Element src : td){
                     if(new String(src.text()).equals("USD") || key_dolor == 1){
-                        //Log.d("DEBUG","Start USD");
                         key_dolor = 1;
                         x++;
                             if(x == 1){
@@ -101,10 +98,25 @@ public class SearchCurrency extends Thread {
                                 x = 0;
                                 key_euro = 0;
                             }
+                    }else if(new String(src.text()).equals("GBP") || key_gbp == 1){
+                        key_gbp = 1;
+                        x++;
+                            if(x == 1){
+                                name_currency = src.text();
+                            }else if(x == 2){
+                                count = Integer.parseInt(src.text());
+                            }else if(x == 4){
+                                rate = Float.valueOf(src.text()) / count;
+                                String return_round = String.valueOf(rate);
+                                rate = Rounding(return_round);
+                                currency.put(name_currency,rate);
+                                x = 0;
+                                key_gbp = 0;
+                            }
+                        }
                     }
                 }
             }
-        }
             } catch (Exception e) {
                  e.printStackTrace(System.err);
             }
@@ -114,11 +126,7 @@ public class SearchCurrency extends Thread {
             b.putInt("total", mTotal);
             msg.setData(b);
             mHandler.sendMessage(msg);
-            //mTotal++;
         }
-            //Log.i("INFO","USD = " + currency.get("USD"));
-            //Log.i("INFO","EUR = " + currency.get("EUR"));
-            //Log.i("INFO","RUB = " + currency.get("RUB"));
     }
     public void setState(int state) {
         mState = state;

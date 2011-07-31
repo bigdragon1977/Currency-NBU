@@ -6,13 +6,13 @@
     <TextView android:id="@+id/label"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:text="@string/title_current"
         ></TextView>
 
     <EditText android:layout_height="wrap_content" 
         android:id="@+id/editText1" 
         android:layout_width="fill_parent" 
         android:inputType="numberDecimal|numberSigned"></EditText>
-  
   <Spinner 
         android:id="@+id/spinner"
         android:layout_width="fill_parent"
@@ -20,7 +20,6 @@
         android:drawSelectorOnTop="true"
         android:prompt="@string/currency_prompt"
     ></Spinner>
-     
      <RadioGroup android:layout_height="wrap_content" 
         android:id="@+id/radioGroup1" 
         android:layout_width="wrap_content">
@@ -37,10 +36,17 @@
         android:text="@string/cu_to"></RadioButton>
     </RadioGroup>
     
-    <Button android:id="@+id/button1" 
-        android:layout_width="wrap_content" 
+    <Button android:id="@+id/button_convert" 
+        android:layout_width="fill_parent" 
         android:layout_height="wrap_content" 
         android:text="@string/cu_convert" 
         android:onClick="cu_Clics"></Button>
+   <Button
+   android:id="@+id/button_clear"
+   android:layout_width="fill_parent"
+   android:layout_height="wrap_content"
+   android:onClick="cu_Clear"
+   android:text="Clear" ></Button>
+
    
 </LinearLayout>

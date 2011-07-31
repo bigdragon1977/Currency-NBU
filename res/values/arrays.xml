@@ -5,9 +5,5 @@
         <item>EUR</item>
         <item>RUB</item>
         <item>GBP</item>
-        <!--<item>Jupiter</item>-->
-        <!--<item>Saturn</item>-->
-        <!--<item>Uranus</item>-->
-        <!--<item>Neptune</item>-->
     </string-array>
 </resources>
