@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/config"
+    <item android:id="@+id/update_rate"
           android:icon="@drawable/update"
-          android:title="@string/config"
+          android:title="@string/update_rate"
           > </item>
     <item android:id="@+id/m_exit"
           android:icon="@drawable/ic_menu_exit"

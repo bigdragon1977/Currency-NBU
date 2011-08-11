@@ -53,10 +53,12 @@ public class Currency extends Activity
     Spinner s ;
     public String select_currency;
     HashMap<String,Float> local_currency;
+    int STATE = 1;
     private final int DIALOG_EXIT = 0;
     private final int DIALOG_ABOUT = 1;
     static final int DIALOG_PROGRESS = 2;
     static final int DIALOG_NOT_RATE = 3;
+    static final int DIALOG_UPDATE_RATE = 4;
     ArrayAdapter<String> adapter;
     String TitleCurrent = "";
     Button convert_button ;
@@ -98,6 +100,7 @@ public class Currency extends Activity
         ContentValues cv = new ContentValues();
         Cursor db_cursor = db.query("update_rate",null,null,null,null,null,null);
           if(db_cursor.getCount() == 0){
+          STATE = 0;
           showDialog(DIALOG_NOT_RATE);
           }
           db_cursor.close();
@@ -184,18 +187,20 @@ public class Currency extends Activity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
             switch (item.getItemId()) {
+                 case R.id.update_rate:
+                    showDialog(DIALOG_UPDATE_RATE);
+                    break;
                  case R.id.m_exit:
                     showDialog(DIALOG_EXIT);
-                    //quit();
                     break;
                 case R.id.m_about:
                     showDialog(DIALOG_ABOUT);
                     break;
                 default:
                 break;
-                 }
-                 return true;
-                 }
+            }
+        return true;
+    }
 @Override
     protected Dialog onCreateDialog(int id) {
         switch (id) {
@@ -227,6 +232,18 @@ public class Currency extends Activity
                 });
             builder_not_rate.setCancelable(false);
             return builder_not_rate.create();
+        case DIALOG_UPDATE_RATE:
+            AlertDialog.Builder builder_update_rate = new AlertDialog.Builder(this);
+            builder_update_rate.setTitle("Message");
+            builder_update_rate.setMessage("You want to update the rate from the site of the NBU");
+                builder_update_rate.setNegativeButton("Ok",new DialogInterface.OnClickListener(){
+                    public void onClick(DialogInterface dialog, int id){
+                    dialog.cancel();
+                    showDialog(DIALOG_PROGRESS);
+                        }
+                });
+            builder_update_rate.setCancelable(false);
+            return builder_update_rate.create();
         case DIALOG_ABOUT:
             AlertDialog.Builder builder_about = new AlertDialog.Builder(this);
             builder_about.setTitle("About");
@@ -258,7 +275,11 @@ public class Currency extends Activity
                 mProgressThread.setState(SearchCurrency.STATE_DONE);
                 Toast.makeText(getApplicationContext(), "Task is finished", Toast.LENGTH_SHORT).show();
                 local_currency = SearchCurrency.currency;
+                if(STATE == 0){
                 Insert_rate_to_database("new");
+                }else{
+                Insert_rate_to_database("update");
+                }
             }
         }
     };
@@ -283,10 +304,7 @@ public class Currency extends Activity
             cv.put(DbOpenHelper.FIELD_CURRENCY_NAME,key);
             id_insert_currency = db.insert(DbOpenHelper.TABLE_NAME_CURRENCY,null,cv);
             cv.clear();
-            }else if(state.equals("update")){
-                Cursor db_cursor_currency = db.query("currency_name",new String[] {"id_currency"},"currency=?",new String[] {key},null,null,null);
-                id_insert_currency = db_cursor_currency.getLong(1);
-            }
+            ///////////////////////////////////////////
             cv.put(DbOpenHelper.FIELD_RATE,insert_value);
             cv.put(DbOpenHelper.FIELD_DATA_UPDATE, insert_date);
             id_return_rate = db.insert(DbOpenHelper.TABLE_NAME_UPDATE,null,cv);
@@ -295,6 +313,21 @@ public class Currency extends Activity
             cv.put("id_update",id_return_rate);
             db.insert("global_currency",null,cv);
             cv.clear();
+            }else if(state.equals("update")){
+                String id_query;
+                Cursor db_currency_id = db.query("currency_name",null,"currency=?",new String[] {key},null,null,null);
+                db_currency_id.moveToNext();
+                id_query = db_currency_id.getString(0);
+                Log.i("TAG","ID == "+ id_query);
+            }
+            //cv.put(DbOpenHelper.FIELD_RATE,insert_value);
+            //cv.put(DbOpenHelper.FIELD_DATA_UPDATE, insert_date);
+            //id_return_rate = db.insert(DbOpenHelper.TABLE_NAME_UPDATE,null,cv);
+            //cv.clear();
+            //cv.put("id_currency",id_insert_currency);
+            //cv.put("id_update",id_return_rate);
+            //db.insert("global_currency",null,cv);
+            //cv.clear();
         }
         db.close();
     }
