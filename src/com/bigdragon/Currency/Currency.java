@@ -290,6 +290,7 @@ public class Currency extends Activity
     private void Insert_rate_to_database(String state){
         long id_insert_currency = 0;
         long id_return_rate;
+        long return_query;
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); 
         Date date = new Date();
         String insert_date = String.valueOf(dateFormat.format(date));
@@ -318,7 +319,17 @@ public class Currency extends Activity
                 Cursor db_currency_id = db.query("currency_name",null,"currency=?",new String[] {key},null,null,null);
                 db_currency_id.moveToNext();
                 id_query = db_currency_id.getString(0);
-                Log.i("TAG","ID == "+ id_query);
+                
+                cv.put(DbOpenHelper.FIELD_RATE,insert_value);
+                cv.put(DbOpenHelper.FIELD_DATA_UPDATE, insert_date);
+                id_return_rate = db.insert(DbOpenHelper.TABLE_NAME_UPDATE,null,cv);
+                cv.clear();
+
+                String[] params = new String[] {id_query};
+                cv.put("id_update",id_return_rate);
+                return_query = db.update("global_currency",cv,"id_currency=?",params);
+                cv.clear();
+                Log.i("TAG","Key Return => "+ return_query);
             }
             //cv.put(DbOpenHelper.FIELD_RATE,insert_value);
             //cv.put(DbOpenHelper.FIELD_DATA_UPDATE, insert_date);
