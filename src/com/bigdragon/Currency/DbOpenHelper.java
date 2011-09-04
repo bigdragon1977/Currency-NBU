@@ -4,6 +4,9 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+/**
+ @brief Сласс для работы с базой данных.
+ */
 public class DbOpenHelper extends SQLiteOpenHelper{
     private static final int DB_VERSION = 1;
     private static final String DB_NAME = "currency_db";
@@ -19,13 +22,18 @@ public class DbOpenHelper extends SQLiteOpenHelper{
     public DbOpenHelper(Context context) {
         super(context, DB_NAME, null,DB_VERSION);
     }
+/**
+ @brief Вызывается для создания базы данных.
+ */
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(CREATE_TABLE_CURRENCY);
         sqLiteDatabase.execSQL(CREATE_TABLE_UPDATE);
         sqLiteDatabase.execSQL(CREATE_TABLE_MAIN);
     }
-
+/**
+ @brief Вызывается для изменения базы данных.
+ */
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         //To change body of implemented methods use File | Settings | File Templates.

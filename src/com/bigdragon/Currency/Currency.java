@@ -43,30 +43,41 @@ import java.util.Map;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
+/**
+ @class Currency
+ @brief Основной клас проекта
+ @details Создает основное окно проекта 
+ в котором и происходит робота
+ @author Kolomoec Andrey
+ @date 2011
+ */
 public class Currency extends Activity
 {
-    private static final String[] currency_name_array = {"USD", "EUR", "RUB" ,"GBP"};
+    private static final String[] currency_name_array = {"USD", "EUR", "RUB" ,"GBP"}; ///< Масив с списком валют 
 	private EditText text;
     private TextView labelview;
     SearchCurrency mProgressThread;
     ProgressDialog mProgressDialog;
-    Spinner s ;
-    public String select_currency;
-    HashMap<String,Float> local_currency;
+    Spinner s ; 
+    public String select_currency; ///< Переменная в которой хранится название (абривеатура) текущей валюты. 
+    HashMap<String,Float> local_currency; ///< Асоциативный масив в котором хранится значение Название валюты => Полученый курс
     int STATE = 1;
+    int RUN = 0;
     private final int DIALOG_EXIT = 0;
     private final int DIALOG_ABOUT = 1;
     static final int DIALOG_PROGRESS = 2;
     static final int DIALOG_NOT_RATE = 3;
     static final int DIALOG_UPDATE_RATE = 4;
     ArrayAdapter<String> adapter;
-    String TitleCurrent = "";
-    Button convert_button ;
-    Button clear_button ;
-    RadioButton fromButton ;
-    RadioButton toButton ;
+    String TitleCurrent = ""; ///< Переменная в которой хранится название текущей валюты
+    Button convert_button ; ///< Кнопка конвертации
+    Button clear_button ; ///< Кнопка очистки поля ввода
+    RadioButton fromButton ; ///< Переключатель 
+    RadioButton toButton ; ///< Переключатель
 
-    /** Called when the activity is first created. */
+/** 
+ @brief Вызывается при первом вызове Activity 
+ */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -116,8 +127,10 @@ public class Currency extends Activity
                     labelview.setText(TitleCurrent + " GRN" + "\n");
                 }
             }
-            };
-
+        };
+/**
+ @brief Обработка нажатия клавиши Convert
+ */
     public void cu_Clics(View view){
     	switch (view.getId()){
     	case R.id.button_convert:
@@ -141,7 +154,9 @@ public class Currency extends Activity
 		}
     }
 
-
+/**
+ @brief Обработка нажатия клавиши Clear
+ */
     public void cu_Clear(View views){
        switch (views.getId()){
        case R.id.button_clear:
@@ -149,6 +164,9 @@ public class Currency extends Activity
        break;
        }
     }
+/**
+ @brief Сокрытие и отображение кнопок Convert и Clear.
+ */
     private void HideOrVisible(int key){
         if(key == 1){
             clear_button.setVisibility(0);
@@ -166,24 +184,42 @@ public class Currency extends Activity
             s.setAdapter(adapter);
         }
     }
+/**
+ @brief Отображение название текущей валюты.
+ */
     private void chengeLabel(String currency_name){
                 labelview.setText(TitleCurrent + " " + currency_name + "\n");
     }
+/**
+ @brief Перевод выбраной валюты в гривны.
+ */
     private float convertValtoGrn(float valut){
         RoundingRate FinalRate = new RoundingRate();
     	return FinalRate.RoundingFloat((valut / Select_rate(select_currency)));
     }
+/**
+ @brief 
+ */
     private float convertValtoVal(float grn){
         RoundingRate FinalRate = new RoundingRate();
     	return FinalRate.RoundingFloat((grn * Select_rate(select_currency)));
     }
-    /*Create menu Item*/
+/**
+@brief Создание меню приложения.
+@param menu Передаваемый параметр.
+@return true При удачном создании меню
+*/
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.currency_menu, menu);
         return true;
     }
+/**
+ @brief Обработка выбора пункта меню.
+ @param item Передаваемый параметр.
+ @return true При удачной обработке фукции.
+ */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
             switch (item.getItemId()) {
@@ -201,6 +237,10 @@ public class Currency extends Activity
             }
         return true;
     }
+/**
+ @brief Создания всех диалогов в программе.
+ @param id Индификатор диалога.
+ */
 @Override
     protected Dialog onCreateDialog(int id) {
         switch (id) {
@@ -232,8 +272,18 @@ public class Currency extends Activity
                 });
             builder_not_rate.setCancelable(false);
             return builder_not_rate.create();
+        case DIALOG_PROGRESS:
+            mProgressDialog = new ProgressDialog(this);
+            //mProgressDialog = new ProgressDialog(Currency.this);
+            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            mProgressDialog.setMessage("Loading...");
+            mProgressThread = new SearchCurrency(handler);
+            mProgressThread.start();
+            //RUN = 1;
+            return mProgressDialog;
         case DIALOG_UPDATE_RATE:
             AlertDialog.Builder builder_update_rate = new AlertDialog.Builder(this);
+            if(needUpdateRate()){
             builder_update_rate.setTitle("Message");
             builder_update_rate.setMessage("You want to update the rate from the site of the NBU");
                 builder_update_rate.setNegativeButton("Ok",new DialogInterface.OnClickListener(){
@@ -242,6 +292,15 @@ public class Currency extends Activity
                     showDialog(DIALOG_PROGRESS);
                         }
                 });
+            }else{
+            builder_update_rate.setTitle("Message");
+            builder_update_rate.setMessage("Update rate is not required");
+                builder_update_rate.setNegativeButton("Ok",new DialogInterface.OnClickListener(){
+                    public void onClick(DialogInterface dialog, int id){
+                    dialog.cancel();
+                        }
+                });
+            }
             builder_update_rate.setCancelable(false);
             return builder_update_rate.create();
         case DIALOG_ABOUT:
@@ -255,19 +314,35 @@ public class Currency extends Activity
                 });
             builder_about.setCancelable(false);
             return builder_about.create();
-        case DIALOG_PROGRESS:
-            mProgressDialog = new ProgressDialog(Currency.this);
-            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            mProgressDialog.setMessage("Loading...");
-            mProgressThread = new SearchCurrency(handler);
-            mProgressThread.start();
-            return mProgressDialog;
         default:
         return null;
         }
     }
+/**
+ @brief Вызыватется при каждом вызове диалога
+ @param id Индификатор диалога
+ @param dialog Диалог
+ */
+    @Override
+    protected void onPrepareDialog(final int id, final Dialog dialog) {
+          super.onPrepareDialog(id, dialog);
+          switch (id) {
+        case DIALOG_PROGRESS:
+            if(RUN == 0){
+                mProgressDialog = new ProgressDialog(this);
+                mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                mProgressDialog.setMessage("Loading...");
+                mProgressThread = new SearchCurrency(handler);
+                mProgressThread.start();
+            }
+                break;
+            default:
+                break;
+                }
+            }
     final Handler handler = new Handler() {
         public void handleMessage(Message msg) {
+            RUN=1;
             int total = msg.getData().getInt("total");
             mProgressDialog.setProgress(total);
             if (total >= 100){
@@ -276,10 +351,13 @@ public class Currency extends Activity
                 Toast.makeText(getApplicationContext(), "Task is finished", Toast.LENGTH_SHORT).show();
                 local_currency = SearchCurrency.currency;
                 if(STATE == 0){
+                //Log.d("DEBUG","Start Insert_rate_to_database - NEW");
                 Insert_rate_to_database("new");
                 }else{
+                //Log.d("DEBUG","Start Insert_rate_to_database - UPDATE");
                 Insert_rate_to_database("update");
                 }
+            RUN = 0;
             }
         }
     };
@@ -289,8 +367,8 @@ public class Currency extends Activity
     }
     private void Insert_rate_to_database(String state){
         long id_insert_currency = 0;
-        long id_return_rate;
-        long return_query;
+        long id_return_rate = 0;
+        long return_query = 0;
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); 
         Date date = new Date();
         String insert_date = String.valueOf(dateFormat.format(date));
@@ -302,18 +380,17 @@ public class Currency extends Activity
             Float value = all.getValue();
             String insert_value = String.valueOf(value);
             if(state.equals("new")){
-            cv.put(DbOpenHelper.FIELD_CURRENCY_NAME,key);
-            id_insert_currency = db.insert(DbOpenHelper.TABLE_NAME_CURRENCY,null,cv);
-            cv.clear();
-            ///////////////////////////////////////////
-            cv.put(DbOpenHelper.FIELD_RATE,insert_value);
-            cv.put(DbOpenHelper.FIELD_DATA_UPDATE, insert_date);
-            id_return_rate = db.insert(DbOpenHelper.TABLE_NAME_UPDATE,null,cv);
-            cv.clear();
-            cv.put("id_currency",id_insert_currency);
-            cv.put("id_update",id_return_rate);
-            db.insert("global_currency",null,cv);
-            cv.clear();
+                cv.put(DbOpenHelper.FIELD_CURRENCY_NAME,key);
+                id_insert_currency = db.insert(DbOpenHelper.TABLE_NAME_CURRENCY,null,cv);
+                cv.clear();
+                cv.put(DbOpenHelper.FIELD_RATE,insert_value);
+                cv.put(DbOpenHelper.FIELD_DATA_UPDATE, insert_date);
+                id_return_rate = db.insert(DbOpenHelper.TABLE_NAME_UPDATE,null,cv);
+                cv.clear();
+                cv.put("id_currency",id_insert_currency);
+                cv.put("id_update",id_return_rate);
+                db.insert("global_currency",null,cv);
+                cv.clear();
             }else if(state.equals("update")){
                 String id_query;
                 Cursor db_currency_id = db.query("currency_name",null,"currency=?",new String[] {key},null,null,null);
@@ -327,26 +404,24 @@ public class Currency extends Activity
 
                 String[] params = new String[] {id_query};
                 cv.put("id_update",id_return_rate);
-                return_query = db.update("global_currency",cv,"id_currency=?",params);
+                db.update("global_currency",cv,"id_currency=?",params);
                 cv.clear();
-                Log.i("TAG","Key Return => "+ return_query);
             }
-            //cv.put(DbOpenHelper.FIELD_RATE,insert_value);
-            //cv.put(DbOpenHelper.FIELD_DATA_UPDATE, insert_date);
-            //id_return_rate = db.insert(DbOpenHelper.TABLE_NAME_UPDATE,null,cv);
-            //cv.clear();
-            //cv.put("id_currency",id_insert_currency);
-            //cv.put("id_update",id_return_rate);
-            //db.insert("global_currency",null,cv);
-            //cv.clear();
         }
         db.close();
+        //dismissDialog(DIALOG_PROGRESS);
+        //dismissDialog(DIALOG_UPDATE_RATE);
     }
+/**
+@brief Фукция выборки из базы курса валюты.
+@param currency Название валюты
+@return Значение курса. Тип возвращеных данных Float.
+ */
    public float Select_rate(String currency){
         String return_rate = "";
         DbOpenHelper dbOpenHelper = new DbOpenHelper(Currency.this);
         SQLiteDatabase db = dbOpenHelper.getWritableDatabase();
-        Log.d("DEBUG SELECT", "SELECT INPUT " + currency);
+        //Log.d("DEBUG SELECT", "SELECT INPUT " + currency);
         String sql = "SELECT rate FROM update_rate WHERE id_update = (SELECT id_update FROM global_currency WHERE id_currency = ( SELECT id_currency FROM currency_name WHERE currency='USD'))";
         Cursor db_cursor = db.rawQuery(sql,null);
         db_cursor.moveToFirst();
@@ -357,6 +432,41 @@ public class Currency extends Activity
         db_cursor.close();
          return Float.valueOf(return_rate);
         }
+/**
+@brief Фукция определяет треруется ли выполнить обновление курса валют
+на основании даты последнего обновления.
+@param Не принимает параметров
+@return На выходе true - если обновление требуется
+false - если не требуется
+*/
+    public boolean needUpdateRate(){
+        String return_date = "";
+        String current_date = "";
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); 
+        Date date = new Date();
+        current_date = String.valueOf(dateFormat.format(date));
+
+        DbOpenHelper dbOpenHelper = new DbOpenHelper(Currency.this);
+        SQLiteDatabase db = dbOpenHelper.getWritableDatabase();
+        //String sql = "SELECT rate FROM update_rate WHERE id_update = (SELECT data FROM update_rate WHERE id_update = ( SELECT id_update FROM global_currency WHERE id_main=1))";
+        String sql = "SELECT data FROM update_rate WHERE id_update = ( SELECT id_update FROM global_currency WHERE id_main= ( SELECT MAX(id_main) FROM global_currency))";
+        Cursor db_cursor = db.rawQuery(sql,null);
+        db_cursor.moveToFirst();
+        while(!db_cursor.isAfterLast()){
+            return_date = db_cursor.getString(0);
+            db_cursor.moveToNext();
+        }
+        db_cursor.close();
+        if(current_date.equals(return_date)){
+            return false;
+        }else{
+            return true;
+        }
+    }
+/**
+ @class CurrencyOnItemSelectedListener
+ @brief Получение значения при виборе.
+ */
 public class CurrencyOnItemSelectedListener implements OnItemSelectedListener {
         public void onItemSelected(AdapterView<?> parent,
                 View view, int pos, long id) {

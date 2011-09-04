@@ -22,6 +22,11 @@ import java.text.DecimalFormat;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+/**
+ @brief Класс для получения курса валют.
+ @details Класс реализующий получение курса валют с офицального
+ сайта НБУ. Класс является потомком класса Thread.
+ */
 public class SearchCurrency extends Thread {
     final static String url = "http://www.bank.gov.ua/Fin_ryn/OF_KURS/Currency/FindByDate.aspx";
     public static HashMap<String,Float> currency = new HashMap<String,Float>();
@@ -42,6 +47,9 @@ public class SearchCurrency extends Thread {
     SearchCurrency(Handler h) {
         mHandler = h;
     }
+/**
+ @brief Вызыватеся при инициализации класса.
+ */
     public void run() {
         mState = STATE_RUNNING;   
         mTotal = 0;
@@ -49,6 +57,7 @@ public class SearchCurrency extends Thread {
         try {
         Document doc = Jsoup.connect(url).get();
         Elements tr = doc.select("form#tableForm table tbody tr");
+        Log.d("DEBUG","Count TR = "+tr.size());
         for(int i = 1; i < tr.size(); i++){
             Elements td = tr.eq(i).select("td");
             if(td.size() == 5){
