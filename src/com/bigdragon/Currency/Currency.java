@@ -359,15 +359,12 @@ public class Currency extends Activity
                 if(total != 200){
                 Toast.makeText(getApplicationContext(), "Task is finished", Toast.LENGTH_SHORT).show();
                     if(STATE == 0){
-                    //Log.d("DEBUG","Start Insert_rate_to_database - NEW");
                         Insert_rate_to_database("new");
                     }else{
-                    //Log.d("DEBUG","Start Insert_rate_to_database - UPDATE");
                         Insert_rate_to_database("update");
                     }
                 }else{
                 Toast.makeText(getApplicationContext(), "Error connect site NBU", Toast.LENGTH_SHORT).show();
-                    Log.d("DEBUG","Error connect NBU");
                     }
             RUN = 0;
             }
@@ -433,7 +430,6 @@ public class Currency extends Activity
         String return_rate = "";
         DbOpenHelper dbOpenHelper = new DbOpenHelper(Currency.this);
         SQLiteDatabase db = dbOpenHelper.getWritableDatabase();
-        //Log.d("DEBUG SELECT", "SELECT INPUT " + currency);
         String sql = "SELECT rate FROM update_rate WHERE id_update = (SELECT id_update FROM global_currency WHERE id_currency = ( SELECT id_currency FROM currency_name WHERE currency='USD'))";
         Cursor db_cursor = db.rawQuery(sql,null);
         db_cursor.moveToFirst();

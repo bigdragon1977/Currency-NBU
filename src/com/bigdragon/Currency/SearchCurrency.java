@@ -53,12 +53,10 @@ public class SearchCurrency extends Thread {
     public void run() {
         mState = STATE_RUNNING;   
         mTotal = 0;
-        Log.d("DEBUG","Current total => "+ mTotal);
         while (mState == STATE_RUNNING) {
         try {
         Document doc = Jsoup.connect(url).get();
         Elements tr = doc.select("form#tableForm table tbody tr");
-        Log.d("DEBUG","Count TR = "+tr.size());
         for(int i = 1; i < tr.size(); i++){
             Elements td = tr.eq(i).select("td");
             if(td.size() == 5){
