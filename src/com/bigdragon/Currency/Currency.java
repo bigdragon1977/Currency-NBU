@@ -68,6 +68,7 @@ public class Currency extends Activity
     static final int DIALOG_PROGRESS = 2;
     static final int DIALOG_NOT_RATE = 3;
     static final int DIALOG_UPDATE_RATE = 4;
+    static final int DIALOG_NOT_UPDATE = 5;
     ArrayAdapter<String> adapter;
     String TitleCurrent = ""; ///< Переменная в которой хранится название текущей валюты
     Button convert_button ; ///< Кнопка конвертации
@@ -224,7 +225,11 @@ public class Currency extends Activity
     public boolean onOptionsItemSelected(MenuItem item) {
             switch (item.getItemId()) {
                  case R.id.update_rate:
+            if(needUpdateRate()){
                     showDialog(DIALOG_UPDATE_RATE);
+            }else{
+                    showDialog(DIALOG_NOT_UPDATE);
+            }
                     break;
                  case R.id.m_exit:
                     showDialog(DIALOG_EXIT);
@@ -273,36 +278,37 @@ public class Currency extends Activity
             builder_not_rate.setCancelable(false);
             return builder_not_rate.create();
         case DIALOG_PROGRESS:
-            mProgressDialog = new ProgressDialog(this);
-            //mProgressDialog = new ProgressDialog(Currency.this);
+            mProgressDialog = new ProgressDialog(Currency.this);
             mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             mProgressDialog.setMessage("Loading...");
             mProgressThread = new SearchCurrency(handler);
             mProgressThread.start();
-            //RUN = 1;
+            RUN = 1;
             return mProgressDialog;
         case DIALOG_UPDATE_RATE:
             AlertDialog.Builder builder_update_rate = new AlertDialog.Builder(this);
-            if(needUpdateRate()){
             builder_update_rate.setTitle("Message");
             builder_update_rate.setMessage("You want to update the rate from the site of the NBU");
-                builder_update_rate.setNegativeButton("Ok",new DialogInterface.OnClickListener(){
-                    public void onClick(DialogInterface dialog, int id){
-                    dialog.cancel();
-                    showDialog(DIALOG_PROGRESS);
-                        }
+            builder_update_rate.setNegativeButton("Ok",new DialogInterface.OnClickListener(){
+                public void onClick(DialogInterface dialog, int id){
+                dialog.cancel();
+                showDialog(DIALOG_PROGRESS);
+                  }
                 });
-            }else{
-            builder_update_rate.setTitle("Message");
-            builder_update_rate.setMessage("Update rate is not required");
-                builder_update_rate.setNegativeButton("Ok",new DialogInterface.OnClickListener(){
-                    public void onClick(DialogInterface dialog, int id){
-                    dialog.cancel();
-                        }
-                });
-            }
             builder_update_rate.setCancelable(false);
             return builder_update_rate.create();
+        case DIALOG_NOT_UPDATE:
+            AlertDialog.Builder not_update_rate = new AlertDialog.Builder(this);
+            not_update_rate.setTitle("Message");
+            not_update_rate.setMessage("Update rate is not required");
+            not_update_rate.setNegativeButton("Ok",new DialogInterface.OnClickListener(){
+                 public void onClick(DialogInterface dialog, int id){
+                 dialog.cancel();
+                   }
+                });
+
+            not_update_rate.setCancelable(false);
+            return not_update_rate.create();
         case DIALOG_ABOUT:
             AlertDialog.Builder builder_about = new AlertDialog.Builder(this);
             builder_about.setTitle("About");
@@ -324,12 +330,12 @@ public class Currency extends Activity
  @param dialog Диалог
  */
     @Override
-    protected void onPrepareDialog(final int id, final Dialog dialog) {
+    protected void onPrepareDialog(int id, Dialog dialog) {
           super.onPrepareDialog(id, dialog);
           switch (id) {
         case DIALOG_PROGRESS:
             if(RUN == 0){
-                mProgressDialog = new ProgressDialog(this);
+                mProgressDialog = new ProgressDialog(Currency.this);
                 mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                 mProgressDialog.setMessage("Loading...");
                 mProgressThread = new SearchCurrency(handler);
@@ -340,6 +346,7 @@ public class Currency extends Activity
                 break;
                 }
             }
+
     final Handler handler = new Handler() {
         public void handleMessage(Message msg) {
             RUN=1;
@@ -348,15 +355,20 @@ public class Currency extends Activity
             if (total >= 100){
                 dismissDialog(DIALOG_PROGRESS);
                 mProgressThread.setState(SearchCurrency.STATE_DONE);
-                Toast.makeText(getApplicationContext(), "Task is finished", Toast.LENGTH_SHORT).show();
                 local_currency = SearchCurrency.currency;
-                if(STATE == 0){
-                //Log.d("DEBUG","Start Insert_rate_to_database - NEW");
-                Insert_rate_to_database("new");
+                if(total != 200){
+                Toast.makeText(getApplicationContext(), "Task is finished", Toast.LENGTH_SHORT).show();
+                    if(STATE == 0){
+                    //Log.d("DEBUG","Start Insert_rate_to_database - NEW");
+                        Insert_rate_to_database("new");
+                    }else{
+                    //Log.d("DEBUG","Start Insert_rate_to_database - UPDATE");
+                        Insert_rate_to_database("update");
+                    }
                 }else{
-                //Log.d("DEBUG","Start Insert_rate_to_database - UPDATE");
-                Insert_rate_to_database("update");
-                }
+                Toast.makeText(getApplicationContext(), "Error connect site NBU", Toast.LENGTH_SHORT).show();
+                    Log.d("DEBUG","Error connect NBU");
+                    }
             RUN = 0;
             }
         }
@@ -416,7 +428,7 @@ public class Currency extends Activity
 @brief Фукция выборки из базы курса валюты.
 @param currency Название валюты
 @return Значение курса. Тип возвращеных данных Float.
- */
+ */ 
    public float Select_rate(String currency){
         String return_rate = "";
         DbOpenHelper dbOpenHelper = new DbOpenHelper(Currency.this);
@@ -477,3 +489,4 @@ public class CurrencyOnItemSelectedListener implements OnItemSelectedListener {
     }
 
 }
+

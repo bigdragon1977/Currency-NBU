@@ -53,6 +53,7 @@ public class SearchCurrency extends Thread {
     public void run() {
         mState = STATE_RUNNING;   
         mTotal = 0;
+        Log.d("DEBUG","Current total => "+ mTotal);
         while (mState == STATE_RUNNING) {
         try {
         Document doc = Jsoup.connect(url).get();
@@ -126,10 +127,11 @@ public class SearchCurrency extends Thread {
                     }
                 }
             }
+            mTotal = 101;
             } catch (Exception e) {
                  e.printStackTrace(System.err);
+                mTotal = 200;
             }
-            mTotal = 101;
             Message msg = mHandler.obtainMessage();
             Bundle b = new Bundle();
             b.putInt("total", mTotal);
